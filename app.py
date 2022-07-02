@@ -1,46 +1,95 @@
+import os
+import datetime
+import time
+import requests
+import logging, time
 # coding: utf-8
 import sys
 from datetime import datetime
-
 import leancloud
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_file
 from flask import render_template
 from flask_sockets import Sockets
 from leancloud import LeanCloudError
+# log_file = open("log.txt", "a+")
+http_base_url = "https://bakchodi.org/api/v3"
+interval_post_per_second = 600
 
-from views.todos import todos_view
+logging.basicConfig(filename="log.txt", 
+                    format='%(asctime)s %(message)s', 
+                    filemode='w') 
+logger=logging.getLogger() 
+logger.setLevel(logging.DEBUG) 
+
+# while True:
+#     logger.debug("This is just a harmless debug message") 
+#     time.sleep(2)
+
+
+def send_post_request(location, json_data):
+    r = requests.post(f"{http_base_url}{location}", json=json_data)
+    return r
+
+
+def send_get_request(location, json_data):
+    r = requests.get(f"{http_base_url}{location}", json=json_data)
+    return r
+
 
 app = Flask(__name__)
-sockets = Sockets(app)
-
-# routing
-app.register_blueprint(todos_view, url_prefix='/todos')
 
 
-@app.route('/')
-def index():
-    return render_template('index.html')
+@app.route('/log')
+def log():
+    return send_file('log.txt')
 
 
-@app.route('/time')
-def time():
-    return str(datetime.now())
+@app.route('/createaccount')
+def createaccount():
+    postData1 = {"username": request.args.get('username'), "password_verify": request.args.get('password'),
+                 "password": request.args.get('password'), "show_nsfw": True}
+    postData = {k: v for k, v in postData1.items() if v}
+    CreateAccountResponse = send_post_request(
+        "/user/register", json_data=postData)
+    with open('create_account.txt', 'a+') as f:
+        f.write(CreateAccountResponse.json())
+        f.write()
+    print(CreateAccountResponse.json())
+    print(CreateAccountResponse.status_code)
 
 
-@app.route('/version')
-def print_version():
-    import sys
-    return sys.version
+@app.route('/createpost')
+def createPost(community_id, name, body=None, url=None, nsfw=False, auth=None, **kwarg):
+    postData1 = {"name": name, "url": url, "body": body,
+                 "nsfw": nsfw, "community_id": int(community_id), "auth": auth}
+    postData = {k: v for k, v in postData1.items() if v}
+    createPostResponse = send_post_request("/post", json_data=postData)
 
 
-@sockets.route('/echo')
-def echo_socket(ws):
-    while True:
-        message = ws.receive()
-        ws.send(message)
+@app.route('/createcomment')
+def CreateComment(content, post_id):
+    postData1 = {"content": content, "post_id": int(post_id), "auth": auth}
+    postData = {k: v for k, v in postData1.items() if v}
+    createCommentResponse = send_post_request("/comment", json_data=postData)
 
 
-# REST API example
+@app.route('/like')
+def like(score, post_id, auth):
+    #   global auth
+    postData1 = {"score": int(1), "post_id": int(post_id), "auth": auth}
+    postData = {k: v for k, v in postData1.items() if v}
+    createCommentResponse = send_post_request("/post/like", json_data=postData)
+
+
+@app.route('/deletepost')
+def DeletePost(post_id, auth):
+    #   global auth
+    postData1 = {"deleted": True, "post_id": int(post_id), "auth": auth}
+    postData = {k: v for k, v in postData1.items() if v}
+    createCommentResponse = send_post_request("/post/delete", json_data=postData)
+
+
+
 class BadGateway(Exception):
     status_code = 502
 
@@ -90,30 +139,3 @@ def handle_bad_request(error):
 @app.route('/api/python-version', methods=['GET'])
 def python_version():
     return jsonify({"python-version": sys.version})
-
-
-@app.route('/api/todos', methods=['GET', 'POST'])
-def todos():
-    if request.method == 'GET':
-        try:
-            todo_list = leancloud.Query(leancloud.Object.extend('Todo')).descending('createdAt').find()
-        except LeanCloudError as e:
-            if e.code == 101:  # Class does not exist on the cloud.
-                return jsonify([])
-            else:
-                raise BadGateway(e.error, e.code)
-        else:
-            return jsonify([todo.dump() for todo in todo_list])
-    elif request.method == 'POST':
-        try:
-            content = request.get_json()['content']
-        except KeyError:
-            raise BadRequest('''receives malformed POST content (proper schema: '{"content": "TODO CONTENT"}')''')
-        todo = leancloud.Object.extend('Todo')()
-        todo.set('content', content)
-        try:
-            todo.save()
-        except LeanCloudError as e:
-            raise BadGateway(e.error, e.code)
-        else:
-            return jsonify(success=True)
