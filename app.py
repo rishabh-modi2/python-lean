@@ -48,13 +48,9 @@ def log():
 @app.route('/createaccount')
 def createaccount():
     postData1 = {"username": request.args.get('username'), "password_verify": request.args.get('password'),
-                 "password": request.args.get('password'), "show_nsfw": True}
+                 "password": request.args.get('password'), "show_nsfw": True, "answer": 'Allow Me'}
     postData = {k: v for k, v in postData1.items() if v}
-    CreateAccountResponse = send_post_request(
-        "/user/register", json_data=postData)
-    with open('create_account.txt', 'a+') as f:
-        f.write(CreateAccountResponse.json())
-        # f.write()
+    CreateAccountResponse = send_post_request("/user/register", json_data=postData)
     logger.debug(CreateAccountResponse.text)
     logger.debug(CreateAccountResponse.status_code)
 
