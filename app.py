@@ -1,3 +1,4 @@
+import multiprocessing
 import os
 import datetime
 import time
@@ -43,6 +44,11 @@ app = Flask(__name__)
     #     print('no sleep')
     # else:
     #     time.sleep(int(request.args.get('sleep')))
+
+
+@app.route('/')
+def log():
+    return 'running'
 
 
 @app.route('/log')
@@ -111,7 +117,7 @@ def CreateComment():
 
 
 @app.route('/like')
-def like(score, post_id, auth):
+def like():
     if request.args.get('sleep')==None:
         print('no sleep')
     else:
@@ -138,6 +144,13 @@ def DeletePost(post_id, auth):
     return createCommentResponse.text
 
 
+@app.route('/rping')
+def rping():
+    while True:
+      requests.get('https://bakchodi.avosapps.us')
+      time.sleep(1500)
+
+  
 
 class BadGateway(Exception):
     status_code = 502
@@ -188,6 +201,7 @@ def handle_bad_request(error):
 @app.route('/api/python-version', methods=['GET'])
 def python_version():
     return jsonify({"python-version": sys.version})
+
 
 
 if __name__ == '__main__':
