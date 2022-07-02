@@ -36,6 +36,12 @@ def send_get_request(location, json_data):
     r = requests.get(f"{http_base_url}{location}", json=json_data)
     return r
 
+def retrypost(endpoint, json_data, p1):
+    postresponse=send_post_request(endpoint, json_data=json_data)
+    if postresponse.status_code!=200:
+        p1=p1+1
+        retrypost(endpoint, json_data, p1=p1)
+
 
 app = Flask(__name__)
 
@@ -46,7 +52,7 @@ app = Flask(__name__)
 
 
 @app.route('/')
-def log():
+def index():
     return 'running'
 
 
