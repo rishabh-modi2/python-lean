@@ -1,4 +1,3 @@
-
 import os
 import datetime
 import time
@@ -47,7 +46,7 @@ app = Flask(__name__)
 
 
 @app.route('/')
-def index():
+def log():
     return 'running'
 
 
@@ -83,9 +82,20 @@ def createaccount():
                  "password": request.args.get('password'), "show_nsfw": True, "answer": 'Allow Me'}
     postData = {k: v for k, v in postData1.items() if v}
     CreateAccountResponse = send_post_request("/user/register", json_data=postData)
-    logger.debug(CreateAccountResponse.text)
-    logger.debug(CreateAccountResponse.status_code)
-    return CreateAccountResponse.text
+    if CreateAccountResponse.status_code!=200:
+        time.sleep(600)
+        CreateAccountResponse = send_post_request("/user/register", json_data=postData)
+        if CreateAccountResponse.status_code!=200:
+            time.sleep(600)
+            CreateAccountResponse = send_post_request("/user/register", json_data=postData)
+        else:
+            logger.debug(CreateAccountResponse.text)
+            logger.debug(CreateAccountResponse.status_code)
+            return CreateAccountResponse.text
+    else:
+        logger.debug(CreateAccountResponse.text)
+        logger.debug(CreateAccountResponse.status_code)
+        return CreateAccountResponse.text
 
 
 
@@ -99,8 +109,27 @@ def createPost():
                  "nsfw": request.args.get('nsfw'), "community_id": int(request.args.get('community_id')), "auth": request.args.get('auth')}
     postData = {k: v for k, v in postData1.items() if v}
     createPostResponse = send_post_request("/post", json_data=postData)
-    logger.debug(createPostResponse.text)
-    return createPostResponse.text
+    if createPostResponse.status_code!=200:
+        time.sleep(600)
+        createPostResponse = send_post_request("/post", json_data=postData)
+        if createPostResponse.status_code!=200:
+            time.sleep(600)
+            createPostResponse = send_post_request("/post", json_data=postData)
+            if createPostResponse.status_code!=200:
+                time.sleep(600)
+                createPostResponse = send_post_request("/post", json_data=postData)
+            else:
+                logger.debug(createPostResponse.text)
+                # logger.debug(createPostResponse.status_code)
+                return createPostResponse.text
+        else:
+            logger.debug(createPostResponse.text)
+            # logger.debug(createPostResponse.status_code)
+            return createPostResponse.text
+    else:
+        logger.debug(createPostResponse.text)
+        # logger.debug(createPostResponse.status_code)
+        return createPostResponse.text
 
 
 @app.route('/createcomment')
@@ -112,12 +141,31 @@ def CreateComment():
     postData1 = {"content": request.args.get('content'), "post_id": int(request.args.get('post_id')), "auth": request.args.get('auth')}
     postData = {k: v for k, v in postData1.items() if v}
     createCommentResponse = send_post_request("/comment", json_data=postData)
-    logger.debug(createCommentResponse.text)
-    return createCommentResponse.text
+    if createCommentResponse.status_code!=200:
+        time.sleep(600)
+        createCommentResponse = send_post_request("/comment", json_data=postData)
+        if createCommentResponse.status_code!=200:
+            time.sleep(600)
+            createCommentResponse = send_post_request("/comment", json_data=postData)
+            if createCommentResponse.status_code!=200:
+                time.sleep(600)
+                createCommentResponse = send_post_request("/comment", json_data=postData)
+            else:
+                logger.debug(createCommentResponse.text)
+                # logger.debug(createCommentResponse.status_code)
+                return createCommentResponse.text
+        else:
+            logger.debug(createCommentResponse.text)
+            # logger.debug(createCommentResponse.status_code)
+            return createCommentResponse.text
+    else:
+        logger.debug(createCommentResponse.text)
+        # logger.debug(createCommentResponse.status_code)
+        return createCommentResponse.text
 
 
 @app.route('/like')
-def like():
+def like(score, post_id, auth):
     if request.args.get('sleep')==None:
         print('no sleep')
     else:
@@ -144,13 +192,6 @@ def DeletePost(post_id, auth):
     return createCommentResponse.text
 
 
-@app.route('/rping')
-def rping():
-    while True:
-      requests.get('https://bakchodi.avosapps.us')
-      time.sleep(1500)
-
-  
 
 class BadGateway(Exception):
     status_code = 502
@@ -201,7 +242,6 @@ def handle_bad_request(error):
 @app.route('/api/python-version', methods=['GET'])
 def python_version():
     return jsonify({"python-version": sys.version})
-
 
 
 if __name__ == '__main__':
