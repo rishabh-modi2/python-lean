@@ -6,11 +6,11 @@ import logging, time
 # coding: utf-8
 import sys
 from datetime import datetime
-import leancloud
+# import leancloud
 from flask import Flask, jsonify, request, send_file
 from flask import render_template
 from flask_sockets import Sockets
-from leancloud import LeanCloudError
+# from leancloud import LeanCloudError
 # log_file = open("log.txt", "a+")
 http_base_url = "https://bakchodi.org/api/v3"
 interval_post_per_second = 600
@@ -39,56 +39,103 @@ def send_get_request(location, json_data):
 
 app = Flask(__name__)
 
+    # if request.args.get('sleep')==None:
+    #     print('no sleep')
+    # else:
+    #     time.sleep(int(request.args.get('sleep')))
+
 
 @app.route('/log')
 def log():
+    if request.args.get('sleep')==None:
+        print('no sleep')
+    else:
+        time.sleep(int(request.args.get('sleep')))
+    print(request.args.get('sleep'))
     return send_file('log.txt')
+
+@app.route('/getauth')
+def getauth():
+    if request.args.get('sleep')==None:
+        print('no sleep')
+    else:
+        time.sleep(int(request.args.get('sleep')))
+    login_data = {"username_or_email": request.args.get('username'), "password": request.args.get('password')}
+    login_data_response = send_post_request("/user/login", json_data=login_data)
+    auth = login_data_response.json()["jwt"]
+    logger.debug(login_data_response.text)
+    return auth
 
 
 @app.route('/createaccount')
 def createaccount():
+    if request.args.get('sleep')==None:
+        print('no sleep')
+    else:
+        time.sleep(int(request.args.get('sleep')))
     postData1 = {"username": request.args.get('username'), "password_verify": request.args.get('password'),
                  "password": request.args.get('password'), "show_nsfw": True, "answer": 'Allow Me'}
     postData = {k: v for k, v in postData1.items() if v}
     CreateAccountResponse = send_post_request("/user/register", json_data=postData)
     logger.debug(CreateAccountResponse.text)
     logger.debug(CreateAccountResponse.status_code)
+    return CreateAccountResponse.text
+
 
 
 @app.route('/createpost')
-def createPost(community_id, name, body=None, url=None, nsfw=False, auth=None, **kwarg):
-    postData1 = {"name": name, "url": url, "body": body,
-                 "nsfw": nsfw, "community_id": int(community_id), "auth": auth}
+def createPost():
+    if request.args.get('sleep')==None:
+        print('no sleep')
+    else:
+        time.sleep(int(request.args.get('sleep')))
+    postData1 = {"name": request.args.get('name'), "url": request.args.get('url'), "body": request.args.get('body'),
+                 "nsfw": request.args.get('nsfw'), "community_id": int(request.args.get('community_id')), "auth": request.args.get('auth')}
     postData = {k: v for k, v in postData1.items() if v}
     createPostResponse = send_post_request("/post", json_data=postData)
     logger.debug(createPostResponse.text)
+    return createPostResponse.text
 
 
 @app.route('/createcomment')
-def CreateComment(content, post_id):
-    postData1 = {"content": content, "post_id": int(post_id), "auth": auth}
+def CreateComment():
+    if request.args.get('sleep')==None:
+        print('no sleep')
+    else:
+        time.sleep(int(request.args.get('sleep')))
+    postData1 = {"content": request.args.get('content'), "post_id": int(request.args.get('post_id')), "auth": request.args.get('auth')}
     postData = {k: v for k, v in postData1.items() if v}
     createCommentResponse = send_post_request("/comment", json_data=postData)
     logger.debug(createCommentResponse.text)
+    return createCommentResponse.text
 
 
 @app.route('/like')
 def like(score, post_id, auth):
+    if request.args.get('sleep')==None:
+        print('no sleep')
+    else:
+        time.sleep(int(request.args.get('sleep')))
     #   global auth
-    postData1 = {"score": int(1), "post_id": int(post_id), "auth": auth}
+    postData1 = {"score": int(1), "post_id": int(request.args.get('post_id')), "auth": request.args.get('auth')}
     postData = {k: v for k, v in postData1.items() if v}
     createCommentResponse = send_post_request("/post/like", json_data=postData)
     logger.debug(createCommentResponse.text)
+    return createCommentResponse.text    
 
 
 @app.route('/deletepost')
 def DeletePost(post_id, auth):
+    if request.args.get('sleep')==None:
+        print('no sleep')
+    else:
+        time.sleep(int(request.args.get('sleep')))
     #   global auth
-    postData1 = {"deleted": True, "post_id": int(post_id), "auth": auth}
+    postData1 = {"deleted": True, "post_id": int(request.args.get('post_id')), "auth": request.args.get('auth')}
     postData = {k: v for k, v in postData1.items() if v}
     createCommentResponse = send_post_request("/post/delete", json_data=postData)
     logger.debug(createCommentResponse.text)
-
+    return createCommentResponse.text
 
 
 
@@ -141,3 +188,7 @@ def handle_bad_request(error):
 @app.route('/api/python-version', methods=['GET'])
 def python_version():
     return jsonify({"python-version": sys.version})
+
+
+if __name__ == '__main__':
+  app.run(debug=True, port=os.getenv("PORT", default=5000))
