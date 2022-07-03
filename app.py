@@ -81,15 +81,15 @@ def createPost(name, url, body, nsfw, community_id, auth, sleep):
             else:
                 logger.debug(createPostResponse.text)
                 # logger.debug(createPostResponse.status_code)
-                return createPostResponse.text
+                return createPostResponse.json()
         else:
             logger.debug(createPostResponse.text)
             # logger.debug(createPostResponse.status_code)
-            return createPostResponse.text
+            return createPostResponse.json()
     else:
         logger.debug(createPostResponse.text)
         # logger.debug(createPostResponse.status_code)
-        return createPostResponse.text
+        return createPostResponse.json()
 
 
 
@@ -219,15 +219,19 @@ def responseCreateComment():
 #requires id community_id sleep
 #createPostResponse.json()['post_view']['post']['id']
 def CreatePostComment():
+    if request.args.get('sleep')==None:
+        print('no sleep')
+    else:
+        time.sleep(int(request.args.get('sleep')))
     submission=reddit.submission(request.args.get('id'))
-    Postresponse=createPost(name=submission.title, url=submission.url, body=request.args.get('body'), nsfw=request.args.get('nsfw'), community_id=request.args.get('community_id'), auth=random.choice(authid), sleep=request.args.get('sleep'))
+    Postresponse=createPost(name=submission.title, url=submission.url, body=request.args.get('body'), nsfw=request.args.get('nsfw'), community_id=request.args.get('community_id'), auth=random.choice(authid), sleep=0)
     commentsleep=300
-    icomment=0
+    icomment=-1
     for comment in submission.comments:
         icomment+=1
         old_sleep=commentsleep
         commentsleep=old_sleep + random.int(300, 500)
-        _thread.start_new_thread(CreateComment, (comment.body, Postresponse, authid[icomment], commentsleep)) #CreateComment(content=comment.body, post_id=Postresponse, auth=authid[icomment], sleep=commentsleep)
+        _thread.start_new_thread(CreateComment, (comment.body, Postresponse['post_view']['post']['id'], authid[icomment], commentsleep)) #CreateComment(content=comment.body, post_id=Postresponse, auth=authid[icomment], sleep=commentsleep)
         if icomment == len(authid)-1:
             break
 
