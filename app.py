@@ -217,7 +217,7 @@ def CreatePostComment():
     for comment in submission.comments:
         icomment+=1
         old_sleep=commentsleep
-        commentsleep=old_sleep + random.int(300. 500)
+        commentsleep=old_sleep + random.int(300, 500)
         _thread.start_new_thread(CreateComment, (comment.body, Postresponse, authid[icomment], commentsleep)) #CreateComment(content=comment.body, post_id=Postresponse, auth=authid[icomment], sleep=commentsleep)
         if icomment == len(authid)-1:
             break
