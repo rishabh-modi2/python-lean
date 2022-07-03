@@ -228,7 +228,7 @@ def CreatePostComment():
     commentsleep=300
     icomment=-1
     for comment in submission.comments:
-        if submission.author=='QualityVote' or submission.author=='AutoModerator':
+        if comment.author=='QualityVote' or comment.author=='AutoModerator' or 'savevideo' in comment.author:
             pass
         else:
             icomment+=1
