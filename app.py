@@ -205,7 +205,7 @@ def responsecreatePost():
 
 @app.route('/createcomment')
 def responseCreateComment():
-    _thread.start_new_thread(CreateComment, (request.args.get('content'), request.args.get('post_id'), request.args.get('sleep'),))    #CreateComment(content=request.args.get('content'), post_id=request.args.get('post_id'), auth=request.args.get('auth'), sleep=request.args.get('sleep'))
+    _thread.start_new_thread(CreateComment, (request.args.get('content'), request.args.get('post_id'), request.args.get('auth'), request.args.get('sleep'),))    #CreateComment(content=request.args.get('content'), post_id=request.args.get('post_id'), auth=request.args.get('auth'), sleep=request.args.get('sleep'))
     return 'success'
 
 @app.route('/createpostcomment')
