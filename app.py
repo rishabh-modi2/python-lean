@@ -125,6 +125,13 @@ def CreateComment(content, post_id, auth, sleep):
         # logger.debug(createCommentResponse.status_code)
         return createCommentResponse.text
 
+def PostResponse():
+    postData1 = {"username": username, "password_verify": password,
+                 "password": password, "show_nsfw": True, "answer": 'Allow Me'}
+    postData = {k: v for k, v in postData1.items() if v}
+    CreateAccountResponse = send_post_request("/user/register", json_data=postData)
+    
+
 def createaccount(username, password, sleep):
     if request.args.get('sleep')==None:
         print('no sleep')
@@ -210,6 +217,7 @@ def responseCreateComment():
 
 @app.route('/createpostcomment')
 #requires id community_id sleep
+#createPostResponse.json()['post_view']['post']['id']
 def CreatePostComment():
     submission=reddit.submission(request.args.get('id'))
     Postresponse=createPost(name=submission.title, url=submission.url, body=request.args.get('body'), nsfw=request.args.get('nsfw'), community_id=request.args.get('community_id'), auth=random.choice(authid), sleep=request.args.get('sleep'))
