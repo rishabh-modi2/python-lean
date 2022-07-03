@@ -227,7 +227,8 @@ def CreatePostComment():
     Postresponse=createPost(name=submission.title, url=submission.url, body=request.args.get('body'), nsfw=request.args.get('nsfw'), community_id=request.args.get('community_id'), auth='eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjE2OTgsImlzcyI6ImJha2Nob2RpLm9yZyIsImlhdCI6MTY1Njc4MTQzMn0.23iwHhUiE6XQsrNWoi1AqbIJ4lFKbiGprORyE0tEDQs', sleep=1)
     commentsleep=300
     icomment=-1
-    for comment in submission.comments:
+    try:
+      for comment in submission.comments:
         if comment.author=='QualityVote' or comment.author=='AutoModerator' or 'savevideo' in comment.author:
             pass
         else:
@@ -237,7 +238,8 @@ def CreatePostComment():
             _thread.start_new_thread(CreateComment, (comment.body, Postresponse['post_view']['post']['id'], authid[icomment], commentsleep)) #CreateComment(content=comment.body, post_id=Postresponse, auth=authid[icomment], sleep=commentsleep)
             if icomment == len(authid)-1:
                 break
-
+    except Exception as e:
+        return e
     return 'succes'
 
 
