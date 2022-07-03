@@ -1,4 +1,4 @@
-import time, praw, _thread, requests, logging, time, sys, datetime, os
+import time, praw, _thread, requests, logging, time, sys, datetime, os, random
 from datetime import datetime
 from flask import Flask, jsonify, request, send_file
 from flask import render_template
@@ -224,16 +224,21 @@ def CreatePostComment():
     else:
         time.sleep(int(request.args.get('sleep')))
     submission=reddit.submission(request.args.get('id'))
-    Postresponse=createPost(name=submission.title, url=submission.url, body=request.args.get('body'), nsfw=request.args.get('nsfw'), community_id=request.args.get('community_id'), auth=random.choice(authid), sleep=0)
+    Postresponse=createPost(name=submission.title, url=submission.url, body=request.args.get('body'), nsfw=request.args.get('nsfw'), community_id=request.args.get('community_id'), auth='eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjE2OTgsImlzcyI6ImJha2Nob2RpLm9yZyIsImlhdCI6MTY1Njc4MTQzMn0.23iwHhUiE6XQsrNWoi1AqbIJ4lFKbiGprORyE0tEDQs', sleep=1)
     commentsleep=300
     icomment=-1
     for comment in submission.comments:
-        icomment+=1
-        old_sleep=commentsleep
-        commentsleep=old_sleep + random.int(300, 500)
-        _thread.start_new_thread(CreateComment, (comment.body, Postresponse['post_view']['post']['id'], authid[icomment], commentsleep)) #CreateComment(content=comment.body, post_id=Postresponse, auth=authid[icomment], sleep=commentsleep)
-        if icomment == len(authid)-1:
-            break
+        if submission.author=='QualityVote' or submission.author=='AutoModerator':
+            pass
+        else:
+            icomment+=1
+            old_sleep=commentsleep
+            commentsleep=old_sleep + random.randint(300, 500)
+            _thread.start_new_thread(CreateComment, (comment.body, Postresponse['post_view']['post']['id'], authid[icomment], commentsleep)) #CreateComment(content=comment.body, post_id=Postresponse, auth=authid[icomment], sleep=commentsleep)
+            if icomment == len(authid)-1:
+                break
+
+    return 'succes'
 
 
 @app.route('/like')
