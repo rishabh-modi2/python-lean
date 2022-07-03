@@ -156,7 +156,37 @@ def createaccount(username, password, sleep):
         logger.debug(CreateAccountResponse.status_code)
         return CreateAccountResponse.text
 
-print('ok')
+def CreatePostComment(id, community_id, sleep):
+    print('ok')
+    if sleep==None:
+        print('no sleep')
+    else:
+        time.sleep(int(sleep))
+    submission=reddit.submission(id)
+    Postresponse=createPost(name=submission.title, url=submission.url, body=None, nsfw=None, community_id=community_id, auth=random.choice(authid), sleep=0)
+    print(Postresponse['post_view']['post']['id'])
+    commentsleep=300
+    commentsleep=0
+    icomment=-1
+    try:
+        for comment in submission.comments:
+            print('comment')
+            if comment.author=='QualityVote' or comment.author=='AutoModerator':
+                pass
+            else:
+                icomment+=1
+                old_sleep=commentsleep
+                commentsleep=old_sleep + random.randint(300, 1000)
+                #Postresponse['post_view']['post']['id']
+                _thread.start_new_thread(CreateComment, (comment.body, Postresponse['post_view']['post']['id'], authid[icomment], commentsleep)) #CreateComment(content=comment.body, post_id=Postresponse, auth=authid[icomment], sleep=commentsleep)
+                if icomment == len(authid)-1:
+                    break
+    except Exception as e:
+        print(e)
+        return e
+    
+
+print('starting')
 
 app = Flask(__name__)
 
@@ -219,35 +249,9 @@ def responseCreateComment():
 @app.route('/createpostcomment')
 #requires id community_id sleep
 #createPostResponse.json()['post_view']['post']['id']
-def CreatePostComment():
-    print('ok')
-    if request.args.get('sleep')==None:
-        print('no sleep')
-    else:
-        time.sleep(int(request.args.get('sleep')))
-    submission=reddit.submission(request.args.get('id'))
-    Postresponse=createPost(name=submission.title, url=submission.url, body=request.args.get('body'), nsfw=request.args.get('nsfw'), community_id=request.args.get('community_id'), auth=random.choice(authid), sleep=0)
-    print(Postresponse['post_view']['post']['id'])
-    commentsleep=300
-    commentsleep=0
-    icomment=-1
-    try:
-        for comment in submission.comments:
-            print('comment')
-            if comment.author=='QualityVote' or comment.author=='AutoModerator':
-                pass
-            else:
-                icomment+=1
-                old_sleep=commentsleep
-                commentsleep=old_sleep + random.randint(300, 500)
-                #Postresponse['post_view']['post']['id']
-                _thread.start_new_thread(CreateComment, (comment.body, Postresponse['post_view']['post']['id'], authid[icomment], commentsleep)) #CreateComment(content=comment.body, post_id=Postresponse, auth=authid[icomment], sleep=commentsleep)
-                if icomment == len(authid)-1:
-                    break
-    except Exception as e:
-        print(e)
-        return e
-    return 'succes'
+def responseCreatePostComment():
+    _thread.start_new_thread(CreatePostComment, (request.args.get('id'), request.args.get('community_id'), request.args.get('sleep'),))
+    return 'success' + request.args.get('sleep')
 
 
 @app.route('/like')
