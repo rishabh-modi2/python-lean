@@ -199,11 +199,11 @@ def responseCreateAccount():
 
 @app.route('/createpost')
 def responsecreatePost():
-    createPost(name=request.args.get('name'), url=request.args.get('url'), body=request.args.get('body'), nsfw=request.args.get('nsfw'), community_id=request.args.get('community_id'), auth=request.args.get('auth'), sleep=request.args.get('sleep'))
+    _thread.start_new_thread(createPost, ) #createPost(name=request.args.get('name'), url=request.args.get('url'), body=request.args.get('body'), nsfw=request.args.get('nsfw'), community_id=request.args.get('community_id'), auth=request.args.get('auth'), sleep=request.args.get('sleep'))
 
 
 @app.route('/createcomment')
-def responseCreateComment()
+def responseCreateComment():
     _thread.start_new_thread(CreateComment, (request.args.get('content'), request.args.get('post_id'), request.args.get('sleep')))    #CreateComment(content=request.args.get('content'), post_id=request.args.get('post_id'), auth=request.args.get('auth'), sleep=request.args.get('sleep'))
     return 'success'
 
