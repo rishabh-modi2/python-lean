@@ -67,6 +67,8 @@ def createPost(name, url, body, nsfw, community_id, auth, sleep):
                  "nsfw": nsfw, "community_id": int(community_id), "auth": auth}
     postData = {k: v for k, v in postData1.items() if v}
     createPostResponse = send_post_request("/post", json_data=postData)
+    logger.debug(createPostResponse.text)
+    logger.debug(createPostResponse.status_code)
     if createPostResponse.status_code!=200:
         time.sleep(600)
         createPostResponse = send_post_request("/post", json_data=postData)
@@ -99,6 +101,8 @@ def CreateComment(content, post_id, auth, sleep):
     postData1 = {"content":content, "post_id":int(post_id), "auth": auth}
     postData = {k: v for k, v in postData1.items() if v}
     createCommentResponse = send_post_request("/comment", json_data=postData)
+    logger.debug(createCommentResponse.text)
+    logger.debug(createCommentResponse.status_code)
     if createCommentResponse.status_code!=200:
         time.sleep(600)
         createCommentResponse = send_post_request("/comment", json_data=postData)
@@ -200,8 +204,8 @@ def responsecreatePost():
 
 @app.route('/createcomment')
 def responseCreateComment()
-    CreateComment(content=request.args.get('content'), post_id=request.args.get('post_id'), auth=request.args.get('auth'), sleep=request.args.get('sleep'))
-
+    _thread.start_new_thread(CreateComment, (request.args.get('content'), request.args.get('post_id'), request.args.get('sleep')))    #CreateComment(content=request.args.get('content'), post_id=request.args.get('post_id'), auth=request.args.get('auth'), sleep=request.args.get('sleep'))
+    return 'success'
 
 @app.route('/createpostcomment')
 #requires id community_id sleep
