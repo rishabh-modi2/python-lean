@@ -1,16 +1,39 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html>
-  <head>
-    <title>Welcome to LeanEngine!</title>
-    <link rel="stylesheet" href="/static/style.css" type="text/css">
-  </head>
-  <body>
-    <div id="container">
-      <h1>LeanEngine</h1>
-      <p>This is a LeanEngine demo application.</p>
-      <p><a href="/time">Routing example</a></p>
-      <p><a href="/api/python-version">Example of having REST API return JSON object showing Python version</a></p>
-      <p><a href="/todos">A simple todo demo</a></p>
-    </div>
-  </body>
-</html>
+<body>
+
+<br><br><h2>createpostcommenttree</h2>
+
+<form action="/createpostcommenttree">
+  <label for="community_id">community_id: </label><br>
+  <input type="text" name="community_id" value="18"><br>
+  <label for="ids">ID: </label><br>
+  <input type="text"  name="id"><br><br>
+  <label for="sleep">sleep: </label><br>
+  <input type="text"  name="sleep"><br>
+  <input type="submit" value="Submit">
+</form> <br>
+
+<br><h2>createcommenttree</h2>
+
+<form action="/createcommenttree">
+  <label for="community_id">post_id: </label><br>
+  <input type="text" name="post_id" ><br>
+  <label for="ids">submission ID: </label><br>
+  <input type="text"  name="id"><br><br>
+  <label for="sleep">sleep: </label><br>
+  <input type="text"  name="sleep"><br>
+  <input type="submit" value="Submit">
+</form> <br>
+
+<br><h2>deletepost</h2>
+
+<form action="/deletepost">
+  <label for="community_id">community_id: </label><br>
+  <input type="text" name="community_id" value="18"><br>
+  <label for="ids">ID: </label><br>
+  <input type="text"  name="id"><br><br>
+  <label for="sleep">sleep: </label><br>
+  <input type="text"  name="sleep"><br>
+  <input type="submit" value="Submit">
+</form> <br>
