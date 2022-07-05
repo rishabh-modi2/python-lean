@@ -269,6 +269,17 @@ def OldCreatePostCommentTree(id, community_id, sleep):
     # CreatePostCommentTree('uugknd', 2, 0)
 
 
+def PushShift(id, community_id, sleep):
+    link_id = id
+    r=requests.get("https://api.pushshift.io/reddit/comment/search?subreddit=Chodi&size=100&link_id=" + link_id)
+    
+    for i in range(0, len(r.json()['data'])):
+        body=r.json()['data'][i]['body']
+        comment_id=r.json()['data'][i]['id']
+        parent_id=r.json()['data'][i]['parent_id']
+
+        
+
 def CreateCommentTree(id, post_id, sleep):
     try:
         print('ok')
