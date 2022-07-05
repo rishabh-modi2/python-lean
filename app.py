@@ -311,15 +311,17 @@ def CreatePostCommentTree(id, community_id, sleep, body, title):
         useauth=authid.pop()
         # if isvideo=='True':
         #     body=
-        if title=='True' or title!=None:
-            rtitle=title
-        else:
+        if title=='None' or title==None:
             rtitle=submission.title
-        if body=='True' or body!=None:
+        else:
+            rtile=title
+        if body=='True':
             rbody=submission.body
             Postresponse=createPost(name=rtitle, url=None, body=rbody, nsfw=None, community_id=community_id, auth=useauth, sleep=0)
-        else:
+        if body=='None':
             Postresponse=createPost(name=rtitle, url=submission.url, body=None, nsfw=None, community_id=community_id, auth=useauth, sleep=0)            
+        else:
+            Postresponse=createPost(name=rtitle, url=None, body=body, nsfw=None, community_id=community_id, auth=useauth, sleep=0)
         post_id=Postresponse['post_view']['post']['id']
         print(int(post_id))
         for comment in submission.comments:
