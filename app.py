@@ -311,7 +311,7 @@ def CreatePostCommentTree(id, community_id, sleep):
 q='hi'
 def TopLevelComment(comment, post_id, useauthid):
     time.sleep(random.randint(10, 300))
-    if q:
+    # if q:
     try:
         comment_sleep=300+random.randint(10, 700)
         # print(comment.author)
@@ -330,7 +330,7 @@ def TopLevelComment(comment, post_id, useauthid):
     
 
 def LevelComment(topcomment, post_id, parent1_id, useauthid):
-    if q:
+    # if q:
     try:
         auth2id=random.sample(raw_auth2id, len(raw_auth2id))
         auth2id.remove(useauthid)
