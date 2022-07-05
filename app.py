@@ -299,7 +299,7 @@ def CreateCommentTree(id, post_id, sleep):
         print(e)
         pass
 
-def CreatePostCommentTree(id, community_id, sleep):
+def CreatePostCommentTree(id, community_id, sleep, body, title):
     try:
         print('ok')
         if sleep==None:
@@ -309,7 +309,17 @@ def CreatePostCommentTree(id, community_id, sleep):
         submission=reddit.submission(id)
         authid=random.sample(raw_authid, len(raw_authid))
         useauth=authid.pop()
-        Postresponse=createPost(name=submission.title, url=submission.url, body=None, nsfw=None, community_id=community_id, auth=useauth, sleep=0)
+        # if isvideo=='True':
+        #     body=
+        if title=='True' or title!=None:
+            rtitle=title
+        else:
+            rtitle=submission.title
+        if body=='True' or body!=None:
+            rbody=submission.body
+            Postresponse=createPost(name=rtitle, url=None, body=rbody, nsfw=None, community_id=community_id, auth=useauth, sleep=0)
+        else:
+            Postresponse=createPost(name=rtitle, url=submission.url, body=None, nsfw=None, community_id=community_id, auth=useauth, sleep=0)            
         post_id=Postresponse['post_view']['post']['id']
         print(int(post_id))
         for comment in submission.comments:
@@ -458,7 +468,7 @@ def responseCreatePostComment():
 
 @app.route('/createpostcommenttree')
 def responseCreatePostCommenTree():
-    _thread.start_new_thread(CreatePostCommentTree, (request.args.get('id'), request.args.get('community_id'), request.args.get('sleep'),))
+    _thread.start_new_thread(CreatePostCommentTree, (request.args.get('id'), request.args.get('community_id'), request.args.get('sleep'), request.args.get('body'), request.args.get('title'),))
     return 'success' + request.args.get('sleep')
 
 @app.route('/createcommenttree')
